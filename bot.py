@@ -48,7 +48,7 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, generate_posts))
 
     # Запуск бота
-    application.run_polling()
+    application.run_polling(allowed_updates=["message"])
 
 if __name__ == '__main__':
     main()
