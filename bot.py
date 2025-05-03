@@ -12,7 +12,8 @@ openai.api_key = OPENAI_API_KEY
 # Функция для генерации постов на основе заданной темы
 def generate_threads_posts(topic):
     try:
-        prompt = f"Представь, что ты создаешь популярные посты для соцсети Threads. Тема: {topic}. Создай 5 идей для постов, которые могут стать популярными. Посты должны быть короткими, интересными, и подходить для широкой аудитории."
+        # Новый промпт, ограничиваем длину постов
+        prompt = f"Представь, что ты создаешь популярные посты для соцсети Threads. Тема: {topic}. Создай 3 коротких поста (не более 400 символов каждый), которые могут стать популярными. Посты должны быть интересными, захватывающими и подходить для широкой аудитории."
 
         # Используем новую модель gpt-3.5-turbo
         response = openai.ChatCompletion.create(
@@ -22,7 +23,7 @@ def generate_threads_posts(topic):
                 {"role": "user", "content": prompt},
             ],
             max_tokens=500,  # Увеличили максимальное количество токенов
-            n=5,
+            n=1,
             temperature=0.7
         )
 
@@ -32,6 +33,16 @@ def generate_threads_posts(topic):
     except Exception as e:
         print(f"Error generating posts: {e}")
         return ["Ошибка при генерации постов. Попробуйте снова."]
+
+# Функция для отправки сообщений с проверкой на длину
+async def send_message_in_parts(update, text):
+    max_length = 4096
+    # Если текст слишком длинный, разбиваем его на части
+    while len(text) > max_length:
+        await update.message.reply_text(text[:max_length])
+        text = text[max_length:]
+    if text:
+        await update.message.reply_text(text)
 
 # Основная функция для работы бота
 async def start(update: Update, context: CallbackContext) -> None:
@@ -46,7 +57,8 @@ async def generate_posts(update: Update, context: CallbackContext) -> None:
     print(f"Generated posts: {posts}")  # Логирование
 
     # Отправляем 5 постов пользователю
-    await update.message.reply_text("\n\n".join(posts))
+    post_text = "\n\n".join(posts)
+    await send_message_in_parts(update, post_text)
 
 # Основной код для запуска бота
 def main():
