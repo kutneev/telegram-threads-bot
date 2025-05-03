@@ -25,10 +25,10 @@ def generate_threads_posts(topic):
     return posts
 
 # Основная функция для работы бота
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text("Привет! Напиши тему, по которой я должен сгенерировать посты для Threads.")
+async def start(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text("Привет! Напиши тему, по которой я должен сгенерировать посты для Threads.")
 
-def generate_posts(update: Update, context: CallbackContext) -> None:
+async def generate_posts(update: Update, context: CallbackContext) -> None:
     # Получаем тему от пользователя
     topic = update.message.text
 
@@ -36,7 +36,7 @@ def generate_posts(update: Update, context: CallbackContext) -> None:
     posts = generate_threads_posts(topic)
 
     # Отправляем 5 постов пользователю
-    update.message.reply_text("\n\n".join(posts))
+    await update.message.reply_text("\n\n".join(posts))
 
 # Основной код для запуска бота
 def main():
